@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel Comercial — Agricef</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-title">
+      <span class="kicker">AGRICEF</span>
+      <h1>Painel Comercial</h1>
+    </div>
+    <div class="topbar-meta">
+      <span id="ultimaAtualizacao">Carregando...</span>
+      <button id="btnAtualizar" title="Recarregar dados">↻ Atualizar</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="cards-grid" id="cardsResumo">
+      <div class="card card-dark">
+        <span class="card-label">Faturado (ano atual)</span>
+        <span class="card-value" id="cardFaturado">—</span>
+      </div>
+      <div class="card card-gold">
+        <span class="card-label">Meta Conservadora</span>
+        <span class="card-value" id="cardMeta">—</span>
+      </div>
+      <div class="card card-light">
+        <span class="card-label">% Atingimento</span>
+        <span class="card-value" id="cardAtingimento">—</span>
+      </div>
+      <div class="card card-light">
+        <span class="card-label">Pipeline Total</span>
+        <span class="card-value" id="cardPipeline">—</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Faturamento Mensal</h2>
+      <div class="chart-wrap">
+        <canvas id="chartFaturamento"></canvas>
+      </div>
+    </section>
+
+    <div class="two-col">
+      <section class="panel">
+        <h2>Faturamento por Linha de Negócio</h2>
+        <div class="chart-wrap chart-wrap--small">
+          <canvas id="chartNivel1"></canvas>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Oportunidades por Expectativa</h2>
+        <div class="chart-wrap chart-wrap--small">
+          <canvas id="chartOportunidades"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <h2>Status do Pipeline Comercial</h2>
+      <div class="chart-wrap">
+        <canvas id="chartPipeline"></canvas>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Maiores Oportunidades em Carteira</h2>
+      <table class="data-table" id="tabelaOportunidades">
+        <thead>
+          <tr><th>Cliente</th><th>Projeto</th><th>Status</th><th>Expectativa</th><th>Valor</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <span>Painel Comercial Agricef · Atualização automática diária via Google Apps Script</span>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
