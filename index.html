@@ -34,8 +34,26 @@
         <span class="card-value" id="cardAtingimento">—</span>
       </div>
       <div class="card card-light">
-        <span class="card-label">Pipeline Total</span>
+        <span class="card-label">Oportunidades em Aberto</span>
         <span class="card-value" id="cardPipeline">—</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Carteira / Previsão de Faturamento</h2>
+      <div class="mini-cards">
+        <div class="mini-card">
+          <span class="mini-label">Pedidos em Carteira (não faturados)</span>
+          <span class="mini-value" id="cartSomaCarteira">—</span>
+        </div>
+        <div class="mini-card">
+          <span class="mini-label">Faturado + Carteira</span>
+          <span class="mini-value" id="cartSomaFaturadoCarteira">—</span>
+        </div>
+        <div class="mini-card">
+          <span class="mini-label">% Faturado + Carteira vs Meta</span>
+          <span class="mini-value" id="cartPercentual">—</span>
+        </div>
       </div>
     </section>
 
@@ -72,8 +90,27 @@
       </section>
     </div>
 
+    <div class="two-col">
+      <section class="panel">
+        <h2>Oportunidades por Linha de Negócio</h2>
+        <div class="chart-wrap chart-wrap--small">
+          <canvas id="chartOportunidadesLinha"></canvas>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Cenários de Faturamento + Oportunidades (2026)</h2>
+        <table class="data-table" id="tabelaCenarios">
+          <thead>
+            <tr><th>Cenário</th><th>Valor Projetado</th><th>% da Meta</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </div>
+
     <section class="panel">
-      <h2>Status do Pipeline Comercial</h2>
+      <h2>Oportunidades por Status</h2>
       <div class="chart-wrap">
         <canvas id="chartPipeline"></canvas>
       </div>

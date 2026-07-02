@@ -31,11 +31,46 @@ async function carregarDados() {
 
 function renderizarTudo(dados) {
   renderizarCards(dados.resumo, dados.pipeline);
+  renderizarCarteira(dados.carteira);
   renderizarMetaPorLinha(dados.resumo.atingimentoPorNivel1);
   renderizarFaturamentoMensal(dados.faturamentoMes);
   renderizarNivel1(dados.resumo.faturadoPorNivel1);
   renderizarOportunidades(dados.oportunidades);
+  renderizarOportunidadesPorLinha(dados.oportunidades.totalPorNivel1);
+  renderizarCenarios(dados.cenarios, dados.carteira);
   renderizarPipeline(dados.pipeline);
+}
+
+function renderizarCarteira(carteira) {
+  if (!carteira) return;
+  document.getElementById('cartSomaCarteira').textContent = fmtMoeda(carteira.somaCarteira);
+  document.getElementById('cartSomaFaturadoCarteira').textContent = fmtMoeda(carteira.somaFaturadoCarteira);
+  document.getElementById('cartPercentual').textContent = fmtPercent(carteira.percentualFaturadoCarteira);
+}
+
+function renderizarCenarios(cenarios, carteira) {
+  const corpoTabela = document.querySelector('#tabelaCenarios tbody');
+  if (!corpoTabela || !cenarios || !carteira) return;
+  const linhas = [
+    { label: 'Faturado + Carteira', valor: carteira.somaFaturadoCarteira, pct: carteira.percentualFaturadoCarteira },
+    { label: '+ Oportunidades Alta', valor: cenarios.somaFatCartA, pct: cenarios.percentualFatCartA },
+    { label: '+ Oportunidades Alta e Média', valor: cenarios.somaFatCartAM, pct: cenarios.percentualFatCartAM },
+    { label: '+ Todas as Oportunidades', valor: cenarios.somaFatCartOport, pct: cenarios.percentualFatCartOport },
+  ];
+  corpoTabela.innerHTML = '';
+  linhas.forEach(l => {
+    const pct = l.pct === null ? 0 : Math.min(l.pct * 100, 100);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${l.label}</td>
+      <td>${fmtMoeda(l.valor)}</td>
+      <td>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span>${fmtPercent(l.pct)}</span>
+      </td>
+    `;
+    corpoTabela.appendChild(tr);
+  });
 }
 
 function renderizarMetaPorLinha(atingimentoPorNivel1) {
@@ -153,6 +188,23 @@ function renderizarOportunidades(oport) {
       `;
       corpoTabela.appendChild(tr);
     });
+}
+
+function renderizarOportunidadesPorLinha(porNivel1) {
+  destruirSeExistir('oportLinha');
+  const ctx = document.getElementById('chartOportunidadesLinha');
+  const labels = Object.keys(porNivel1 || {});
+  charts.oportLinha = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: Object.values(porNivel1 || {}),
+        backgroundColor: [PALETA.darkGreen, PALETA.gold, PALETA.sage, PALETA.midGreen],
+      }],
+    },
+    options: { responsive: true, maintainAspectRatio: false },
+  });
 }
 
 function renderizarPipeline(pipeline) {
