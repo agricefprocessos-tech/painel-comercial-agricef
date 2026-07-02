@@ -135,6 +135,25 @@ main {
 
 .data-table tr:hover { background: var(--offwhite); }
 
+.progress-bar {
+  position: relative;
+  height: 8px;
+  width: 140px;
+  background: #ECEFEC;
+  border-radius: 6px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: var(--gold);
+  border-radius: 6px;
+}
+
 footer {
   text-align: center;
   padding: 18px;

@@ -31,10 +31,30 @@ async function carregarDados() {
 
 function renderizarTudo(dados) {
   renderizarCards(dados.resumo, dados.pipeline);
+  renderizarMetaPorLinha(dados.resumo.atingimentoPorNivel1);
   renderizarFaturamentoMensal(dados.faturamentoMes);
   renderizarNivel1(dados.resumo.faturadoPorNivel1);
   renderizarOportunidades(dados.oportunidades);
   renderizarPipeline(dados.pipeline);
+}
+
+function renderizarMetaPorLinha(atingimentoPorNivel1) {
+  const corpoTabela = document.querySelector('#tabelaMetaLinha tbody');
+  corpoTabela.innerHTML = '';
+  Object.entries(atingimentoPorNivel1 || {}).forEach(([linha, dado]) => {
+    const pct = dado.percentual === null ? 0 : Math.min(dado.percentual * 100, 100);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${linha}</td>
+      <td>${fmtMoeda(dado.faturado)}</td>
+      <td>${fmtMoeda(dado.meta)}</td>
+      <td>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span>${fmtPercent(dado.percentual)}</span>
+      </td>
+    `;
+    corpoTabela.appendChild(tr);
+  });
 }
 
 function renderizarCards(resumo, pipeline) {
