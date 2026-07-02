@@ -40,6 +40,7 @@ function renderizarTudo(dados) {
 
 function renderizarMetaPorLinha(atingimentoPorNivel1) {
   const corpoTabela = document.querySelector('#tabelaMetaLinha tbody');
+  if (!corpoTabela) return;
   corpoTabela.innerHTML = '';
   Object.entries(atingimentoPorNivel1 || {}).forEach(([linha, dado]) => {
     const pct = dado.percentual === null ? 0 : Math.min(dado.percentual * 100, 100);
