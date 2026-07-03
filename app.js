@@ -43,6 +43,57 @@ function renderizarTudo(dados) {
   renderizarOportunidadesLinhaCards(dados.oportunidades.totalPorNivel1);
   renderizarCenarios(dados.cenarios, dados.carteira);
   renderizarPipeline(dados.pipeline);
+  renderizarPrevisaoEqpto(dados.previsaoEqpto);
+}
+
+function renderizarPrevisaoEqpto(previsaoEqpto) {
+  if (!previsaoEqpto) return;
+  document.getElementById('eqptoValorTotal').textContent = fmtMoeda(previsaoEqpto.totalGeral);
+  const porStatus = previsaoEqpto.totalPorStatus || {};
+  document.getElementById('eqptoEmNegociacao').textContent = (porStatus['EM NEGOCIAÇÃO'] || 0) + ' projetos';
+  document.getElementById('eqptoFechado').textContent = (porStatus['FECHADO'] || 0) + ' projetos';
+
+  destruirSeExistir('previsaoEqpto');
+  const ctx = document.getElementById('chartPrevisaoEqpto');
+  const serie = previsaoEqpto.porMes || [];
+  const statusList = Array.from(new Set(serie.flatMap(s => Object.keys(s.porStatus))));
+  const cores = { 'EM NEGOCIAÇÃO': PALETA.gold, FECHADO: PALETA.darkGreen, FECHADA: PALETA.midGreen };
+  charts.previsaoEqpto = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: serie.map(s => s.mes),
+      datasets: statusList.map(status => ({
+        label: status,
+        data: serie.map(s => s.porStatus[status] || 0),
+        backgroundColor: cores[status] || PALETA.sage,
+      })),
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { x: { stacked: true }, y: { stacked: true, ticks: { stepSize: 1 } } },
+    },
+  });
+
+  const corpoTabela = document.querySelector('#tabelaPrevisaoEqpto tbody');
+  if (!corpoTabela) return;
+  corpoTabela.innerHTML = '';
+  (previsaoEqpto.lista || [])
+    .slice()
+    .sort((a, b) => (Number(b.ValorTotal) || 0) - (Number(a.ValorTotal) || 0))
+    .forEach(l => {
+      const mes = l.PrevPedido ? new Date(l.PrevPedido).toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }) : '';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${l.Cliente || ''}</td>
+        <td>${l.Projeto || ''}</td>
+        <td>${l.Status || ''}</td>
+        <td>${mes}</td>
+        <td>${l.StatusProd || ''}</td>
+        <td>${fmtMoeda(l.ValorTotal)}</td>
+      `;
+      corpoTabela.appendChild(tr);
+    });
 }
 
 function renderizarCarteira(carteira) {

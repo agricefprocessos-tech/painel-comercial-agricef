@@ -150,6 +150,33 @@
     </section>
 
     <section class="panel">
+      <h2>Previsão de Equipamentos (Entrega/Faturamento)</h2>
+      <div class="mini-cards">
+        <div class="mini-card">
+          <span class="mini-label">Valor Total Previsto</span>
+          <span class="mini-value" id="eqptoValorTotal">—</span>
+        </div>
+        <div class="mini-card">
+          <span class="mini-label">Em Negociação</span>
+          <span class="mini-value" id="eqptoEmNegociacao">—</span>
+        </div>
+        <div class="mini-card">
+          <span class="mini-label">Fechado</span>
+          <span class="mini-value" id="eqptoFechado">—</span>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartPrevisaoEqpto"></canvas>
+      </div>
+      <table class="data-table" id="tabelaPrevisaoEqpto">
+        <thead>
+          <tr><th>Cliente</th><th>Projeto</th><th>Status</th><th>Mês Previsto</th><th>Status Produção</th><th>Valor</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="panel">
       <h2>Oportunidades por Status</h2>
       <div class="chart-wrap">
         <canvas id="chartPipeline"></canvas>
