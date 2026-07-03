@@ -193,11 +193,31 @@ function renderizarMetaPorLinha(atingimentoPorNivel1) {
   });
 }
 
+// Colapsa chaves de agregação que diferem apenas por espaços, acentuação/caixa
+// ou variação de gênero (ex.: "MÉDIA" + "MÉDIA ", "FECHADO" + "FECHADA"), somando
+// os valores. Mantém o primeiro rótulo legível encontrado. Evita categorias
+// duplicadas nos gráficos por causa de inconsistências de digitação na base.
+function agruparChavesSimilares(obj, canonico) {
+  canonico = canonico || {};
+  const acc = {}; // chaveNormalizada -> { label, valor }
+  Object.keys(obj || {}).forEach(raw => {
+    const base = String(raw).trim();
+    let norm = base.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (canonico[norm]) norm = canonico[norm];
+    if (!acc[norm]) acc[norm] = { label: base, valor: 0 };
+    acc[norm].valor += Number(obj[raw]) || 0;
+  });
+  const out = {};
+  Object.keys(acc).forEach(k => { out[acc[k].label] = acc[k].valor; });
+  return out;
+}
+
 function renderizarCards(resumo, pipeline) {
   document.getElementById('cardFaturado').textContent = fmtMoeda(resumo.totalFaturado);
   document.getElementById('cardMeta').textContent = fmtMoeda(resumo.metaConservadora);
   document.getElementById('cardAtingimento').textContent = fmtPercent(resumo.percentualAtingimento);
-  document.getElementById('cardPipeline').textContent = pipeline.totalPropostas + ' propostas';
+  const totalProp = Object.values(pipeline.porStatus || {}).reduce((a, b) => a + (Number(b) || 0), 0);
+  document.getElementById('cardPipeline').textContent = totalProp + ' propostas';
   document.getElementById('cardRitmo').textContent = fmtPercent(resumo.percentualAtingimentoPacing);
 }
 
@@ -315,15 +335,16 @@ function renderizarNivel1(porNivel1) {
 function renderizarOportunidades(oport) {
   destruirSeExistir('oportunidades');
   const ctx = document.getElementById('chartOportunidades');
-  const labels = Object.keys(oport.totalPorExpectativa);
+  const expect = agruparChavesSimilares(oport.totalPorExpectativa);
+  const labels = Object.keys(expect);
   charts.oportunidades = new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [{
         label: 'Valor (R$)',
-        data: Object.values(oport.totalPorExpectativa),
-        backgroundColor: [PALETA.darkGreen, PALETA.gold, PALETA.sage],
+        data: Object.values(expect),
+        backgroundColor: [PALETA.darkGreen, PALETA.gold, PALETA.sage, PALETA.midGreen],
         borderRadius: 4,
       }],
     },
@@ -375,14 +396,15 @@ function renderizarOportunidadesPorLinha(porNivel1) {
 function renderizarPipeline(pipeline) {
   destruirSeExistir('pipeline');
   const ctx = document.getElementById('chartPipeline');
-  const labels = Object.keys(pipeline.porStatus);
+  const status = agruparChavesSimilares(pipeline.porStatus, { 'FECHADA': 'FECHADO' });
+  const labels = Object.keys(status);
   charts.pipeline = new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [{
         label: 'Propostas',
-        data: Object.values(pipeline.porStatus),
+        data: Object.values(status),
         backgroundColor: PALETA.gold,
         borderRadius: 4,
       }],
