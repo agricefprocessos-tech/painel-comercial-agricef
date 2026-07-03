@@ -70,7 +70,7 @@ main {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 28px;
 }
@@ -103,6 +103,16 @@ main {
   font-size: 15px;
   color: var(--dark-green);
   margin: 0 0 14px;
+}
+
+.panel h3 {
+  font-size: 13px;
+  color: var(--grey);
+  margin: 0 0 10px;
+}
+
+.panel .two-col {
+  margin-top: 20px;
 }
 
 .chart-wrap { height: 320px; }
