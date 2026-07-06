@@ -231,8 +231,7 @@ function renderizarCards(resumo, pipeline) {
   document.getElementById('cardFaturado').textContent = fmtMoeda(resumo.totalFaturado);
   document.getElementById('cardMeta').textContent = fmtMoeda(resumo.metaConservadora);
   document.getElementById('cardAtingimento').textContent = fmtPercent(resumo.percentualAtingimento);
-  const totalProp = Object.values(pipeline.porStatus || {}).reduce((a, b) => a + (Number(b) || 0), 0);
-  document.getElementById('cardPipeline').textContent = totalProp + ' propostas';
+  document.getElementById('cardPipeline').textContent = pipeline.totalPropostas + ' propostas';
   document.getElementById('cardRitmo').textContent = fmtPercent(resumo.percentualAtingimentoPacing);
 }
 
