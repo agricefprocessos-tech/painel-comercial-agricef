@@ -19,184 +19,220 @@
     </div>
   </header>
 
-  <main>
-    <section class="cards-grid" id="cardsResumo">
-      <div class="card card-dark">
-        <span class="card-label">Faturado (ano atual)</span>
-        <span class="card-value" id="cardFaturado">—</span>
-      </div>
-      <div class="card card-gold">
-        <span class="card-label">Meta Conservadora</span>
-        <span class="card-value" id="cardMeta">—</span>
-      </div>
-      <div class="card card-light">
-        <span class="card-label">% Atingimento</span>
-        <span class="card-value" id="cardAtingimento">—</span>
-      </div>
-      <div class="card card-light">
-        <span class="card-label">Oportunidades em Aberto</span>
-        <span class="card-value" id="cardPipeline">—</span>
-      </div>
-      <div class="card card-dark">
-        <span class="card-label">% Ritmo (vs. meta do período)</span>
-        <span class="card-value" id="cardRitmo">—</span>
-      </div>
-    </section>
+  <div class="app-shell">
+    <nav class="sidebar-nav" id="sidebarNav">
+      <button class="nav-item active" data-page="resumo">Resumo</button>
+      <button class="nav-item" data-page="faturamento">Faturamento</button>
+      <button class="nav-item" data-page="carteira">Carteira</button>
+      <button class="nav-item" data-page="oportunidades">Oportunidades</button>
+      <button class="nav-item" data-page="cenarios">Cenários</button>
+      <button class="nav-item" data-page="previsao-eqpto">Previsão de Equipamentos</button>
+      <button class="nav-item" data-page="analise-ia">Análise IA</button>
+    </nav>
 
-    <section class="panel">
-      <h2>Carteira / Previsão de Faturamento</h2>
-      <div class="mini-cards">
-        <div class="mini-card">
-          <span class="mini-label">Pedidos em Carteira (não faturados)</span>
-          <span class="mini-value" id="cartSomaCarteira">—</span>
-        </div>
-        <div class="mini-card">
-          <span class="mini-label">Faturado + Carteira</span>
-          <span class="mini-value" id="cartSomaFaturadoCarteira">—</span>
-        </div>
-        <div class="mini-card">
-          <span class="mini-label">% Faturado + Carteira vs Meta</span>
-          <span class="mini-value" id="cartPercentual">—</span>
-        </div>
-      </div>
+    <main class="page-container">
 
-      <div class="two-col">
-        <div>
-          <h3>Previsão de Conversão da Carteira (por mês)</h3>
-          <div class="chart-wrap chart-wrap--small">
-            <canvas id="chartCarteiraMensal"></canvas>
+      <section class="page active" data-page="resumo">
+        <section class="cards-grid" id="cardsResumo">
+          <div class="card card-dark">
+            <span class="card-label">Faturado (ano atual)</span>
+            <span class="card-value" id="cardFaturado">—</span>
+          </div>
+          <div class="card card-gold">
+            <span class="card-label">Meta Conservadora</span>
+            <span class="card-value" id="cardMeta">—</span>
+          </div>
+          <div class="card card-light">
+            <span class="card-label">% Atingimento</span>
+            <span class="card-value" id="cardAtingimento">—</span>
+          </div>
+          <div class="card card-light">
+            <span class="card-label">Oportunidades em Aberto</span>
+            <span class="card-value" id="cardPipeline">—</span>
+          </div>
+          <div class="card card-dark">
+            <span class="card-label">% Ritmo (vs. meta do período)</span>
+            <span class="card-value" id="cardRitmo">—</span>
+          </div>
+        </section>
+
+        <section class="panel panel--grow">
+          <h2>Meta por Linha de Negócio (2026)</h2>
+          <div class="table-scroll">
+            <table class="data-table" id="tabelaMetaLinha">
+              <thead>
+                <tr><th>Linha de Negócio</th><th>Faturado</th><th>Meta</th><th>% Atingimento</th><th>Meta do Período</th><th>% Ritmo</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" data-page="faturamento">
+        <div class="page-grid-2x2">
+          <section class="panel">
+            <h2>Faturamento Mensal</h2>
+            <div class="chart-wrap">
+              <canvas id="chartFaturamento"></canvas>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Faturamento por Linha de Negócio</h2>
+            <div class="chart-wrap">
+              <canvas id="chartNivel1"></canvas>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Faturamento Mensal por Linha de Negócio</h2>
+            <div class="chart-wrap">
+              <canvas id="chartFaturamentoMensalLinha"></canvas>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Detalhamento por Sub-linha (Nível 2 / Nível 3)</h2>
+            <div class="table-scroll">
+              <table class="data-table" id="tabelaNivel3">
+                <thead>
+                  <tr><th>Linha</th><th>Sub-linha</th><th>Item</th><th>Valor Faturado</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="page" data-page="carteira">
+        <div class="mini-cards">
+          <div class="mini-card">
+            <span class="mini-label">Pedidos em Carteira (não faturados)</span>
+            <span class="mini-value" id="cartSomaCarteira">—</span>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">Faturado + Carteira</span>
+            <span class="mini-value" id="cartSomaFaturadoCarteira">—</span>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">% Faturado + Carteira vs Meta</span>
+            <span class="mini-value" id="cartPercentual">—</span>
           </div>
         </div>
-        <div>
-          <h3>Maiores Itens em Carteira</h3>
-          <table class="data-table" id="tabelaCarteiraDetalhe">
+        <div class="two-col two-col--grow">
+          <section class="panel">
+            <h3>Previsão de Conversão da Carteira (por mês)</h3>
+            <div class="chart-wrap">
+              <canvas id="chartCarteiraMensal"></canvas>
+            </div>
+          </section>
+          <section class="panel">
+            <h3>Maiores Itens em Carteira</h3>
+            <div class="table-scroll">
+              <table class="data-table" id="tabelaCarteiraDetalhe">
+                <thead>
+                  <tr><th>Cliente</th><th>Projeto</th><th>Mês</th><th>Valor</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="page" data-page="oportunidades">
+        <div class="page-grid-2x2">
+          <section class="panel">
+            <h2>Oportunidades por Expectativa</h2>
+            <div class="chart-wrap">
+              <canvas id="chartOportunidades"></canvas>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Oportunidades por Linha de Negócio</h2>
+            <div class="mini-cards" id="cardsOportunidadesLinha"></div>
+            <div class="chart-wrap">
+              <canvas id="chartOportunidadesLinha"></canvas>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Oportunidades por Status</h2>
+            <div class="chart-wrap">
+              <canvas id="chartPipeline"></canvas>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Maiores Oportunidades em Carteira</h2>
+            <div class="table-scroll">
+              <table class="data-table" id="tabelaOportunidades">
+                <thead>
+                  <tr><th>Cliente</th><th>Projeto</th><th>Status</th><th>Expectativa</th><th>Valor</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="page" data-page="cenarios">
+        <section class="panel panel--centered">
+          <h2>Cenários de Faturamento + Oportunidades (2026)</h2>
+          <table class="data-table data-table--large" id="tabelaCenarios">
             <thead>
-              <tr><th>Cliente</th><th>Projeto</th><th>Mês</th><th>Valor</th></tr>
+              <tr><th>Cenário</th><th>Valor Projetado</th><th>% da Meta</th></tr>
             </thead>
             <tbody></tbody>
           </table>
+        </section>
+      </section>
+
+      <section class="page" data-page="previsao-eqpto">
+        <div class="mini-cards">
+          <div class="mini-card">
+            <span class="mini-label">Valor Total Previsto</span>
+            <span class="mini-value" id="eqptoValorTotal">—</span>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">Em Negociação</span>
+            <span class="mini-value" id="eqptoEmNegociacao">—</span>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">Fechado</span>
+            <span class="mini-value" id="eqptoFechado">—</span>
+          </div>
         </div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Meta por Linha de Negócio (2026)</h2>
-      <table class="data-table" id="tabelaMetaLinha">
-        <thead>
-          <tr><th>Linha de Negócio</th><th>Faturado</th><th>Meta</th><th>% Atingimento</th><th>Meta do Período</th><th>% Ritmo</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="panel">
-      <h2>Faturamento Mensal</h2>
-      <div class="chart-wrap">
-        <canvas id="chartFaturamento"></canvas>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Faturamento Mensal por Linha de Negócio</h2>
-      <div class="chart-wrap">
-        <canvas id="chartFaturamentoMensalLinha"></canvas>
-      </div>
-    </section>
-
-    <div class="two-col">
-      <section class="panel">
-        <h2>Faturamento por Linha de Negócio</h2>
-        <div class="chart-wrap chart-wrap--small">
-          <canvas id="chartNivel1"></canvas>
+        <div class="two-col two-col--grow">
+          <section class="panel">
+            <h3>Previsão por Mês e Status</h3>
+            <div class="chart-wrap">
+              <canvas id="chartPrevisaoEqpto"></canvas>
+            </div>
+          </section>
+          <section class="panel">
+            <h3>Detalhamento</h3>
+            <div class="table-scroll">
+              <table class="data-table" id="tabelaPrevisaoEqpto">
+                <thead>
+                  <tr><th>Cliente</th><th>Projeto</th><th>Status</th><th>Mês Previsto</th><th>Status Produção</th><th>Valor</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </section>
 
-      <section class="panel">
-        <h2>Oportunidades por Expectativa</h2>
-        <div class="chart-wrap chart-wrap--small">
-          <canvas id="chartOportunidades"></canvas>
-        </div>
-      </section>
-    </div>
-
-    <div class="two-col">
-      <section class="panel">
-        <h2>Oportunidades por Linha de Negócio</h2>
-        <div class="mini-cards" id="cardsOportunidadesLinha"></div>
-        <div class="chart-wrap chart-wrap--small">
-          <canvas id="chartOportunidadesLinha"></canvas>
-        </div>
+      <section class="page" data-page="analise-ia">
+        <section class="panel panel--centered panel--ia">
+          <div class="ia-badge">Gerado por IA</div>
+          <h2>Análise dos Principais Indicadores</h2>
+          <p class="ia-texto" id="iaTexto">Carregando análise...</p>
+          <p class="ia-timestamp" id="iaTimestamp"></p>
+        </section>
       </section>
 
-      <section class="panel">
-        <h2>Cenários de Faturamento + Oportunidades (2026)</h2>
-        <table class="data-table" id="tabelaCenarios">
-          <thead>
-            <tr><th>Cenário</th><th>Valor Projetado</th><th>% da Meta</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </section>
-    </div>
-
-    <section class="panel">
-      <h2>Detalhamento por Sub-linha (Nível 2 / Nível 3)</h2>
-      <table class="data-table" id="tabelaNivel3">
-        <thead>
-          <tr><th>Linha</th><th>Sub-linha</th><th>Item</th><th>Valor Faturado</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="panel">
-      <h2>Previsão de Equipamentos (Entrega/Faturamento)</h2>
-      <div class="mini-cards">
-        <div class="mini-card">
-          <span class="mini-label">Valor Total Previsto</span>
-          <span class="mini-value" id="eqptoValorTotal">—</span>
-        </div>
-        <div class="mini-card">
-          <span class="mini-label">Em Negociação</span>
-          <span class="mini-value" id="eqptoEmNegociacao">—</span>
-        </div>
-        <div class="mini-card">
-          <span class="mini-label">Fechado</span>
-          <span class="mini-value" id="eqptoFechado">—</span>
-        </div>
-      </div>
-      <div class="chart-wrap">
-        <canvas id="chartPrevisaoEqpto"></canvas>
-      </div>
-      <table class="data-table" id="tabelaPrevisaoEqpto">
-        <thead>
-          <tr><th>Cliente</th><th>Projeto</th><th>Status</th><th>Mês Previsto</th><th>Status Produção</th><th>Valor</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="panel">
-      <h2>Oportunidades por Status</h2>
-      <div class="chart-wrap">
-        <canvas id="chartPipeline"></canvas>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Maiores Oportunidades em Carteira</h2>
-      <table class="data-table" id="tabelaOportunidades">
-        <thead>
-          <tr><th>Cliente</th><th>Projeto</th><th>Status</th><th>Expectativa</th><th>Valor</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-  </main>
-
-  <footer>
-    <span>Painel Comercial Agricef · Atualização automática diária via Google Apps Script</span>
-  </footer>
+    </main>
+  </div>
 
   <script src="config.js"></script>
   <script src="app.js"></script>

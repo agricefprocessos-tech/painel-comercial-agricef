@@ -44,6 +44,21 @@ function renderizarTudo(dados) {
   renderizarCenarios(dados.cenarios, dados.carteira);
   renderizarPipeline(dados.pipeline);
   renderizarPrevisaoEqpto(dados.previsaoEqpto);
+  renderizarAnaliseIA(dados.analiseIA);
+  redimensionarGraficos();
+}
+
+function renderizarAnaliseIA(analiseIA) {
+  const elTexto = document.getElementById('iaTexto');
+  const elTimestamp = document.getElementById('iaTimestamp');
+  if (!elTexto || !elTimestamp) return;
+  if (!analiseIA || !analiseIA.texto) {
+    elTexto.textContent = 'Análise ainda não gerada — fica disponível após a próxima execução do gatilho diário (06:00).';
+    elTimestamp.textContent = '';
+    return;
+  }
+  elTexto.textContent = analiseIA.texto;
+  elTimestamp.textContent = 'Gerado em ' + new Date(analiseIA.geradoEm).toLocaleString('pt-BR');
 }
 
 function renderizarPrevisaoEqpto(previsaoEqpto) {
@@ -416,6 +431,26 @@ function renderizarPipeline(pipeline) {
     },
   });
 }
+
+function redimensionarGraficos() {
+  requestAnimationFrame(() => {
+    Object.values(charts).forEach(c => c && c.resize());
+  });
+}
+
+function mostrarPagina(nome) {
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === nome);
+  });
+  document.querySelectorAll('.page').forEach(pagina => {
+    pagina.classList.toggle('active', pagina.dataset.page === nome);
+  });
+  redimensionarGraficos();
+}
+
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => mostrarPagina(btn.dataset.page));
+});
 
 document.getElementById('btnAtualizar').addEventListener('click', carregarDados);
 carregarDados();
