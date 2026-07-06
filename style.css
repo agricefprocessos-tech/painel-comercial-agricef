@@ -275,10 +275,22 @@ html, body {
 .mini-label { font-size: 12px; color: var(--grey); }
 .mini-value { font-size: 20px; font-weight: 700; color: var(--dark-green); }
 
-.panel--ia { gap: 14px; }
+.panel--ia-compact {
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.ia-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ia-header h2 { margin: 0; }
 
 .ia-badge {
-  align-self: center;
+  flex: 0 0 auto;
   background: var(--gold-light);
   color: #7a5312;
   font-size: 11px;
@@ -290,7 +302,7 @@ html, body {
 }
 
 .ia-texto {
-  font-size: 16px;
+  font-size: 14.5px;
   line-height: 1.6;
   color: var(--charcoal);
 }

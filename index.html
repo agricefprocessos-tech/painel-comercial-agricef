@@ -27,7 +27,6 @@
       <button class="nav-item" data-page="oportunidades">Oportunidades</button>
       <button class="nav-item" data-page="cenarios">Cenários</button>
       <button class="nav-item" data-page="previsao-eqpto">Previsão de Equipamentos</button>
-      <button class="nav-item" data-page="analise-ia">Análise IA</button>
     </nav>
 
     <main class="page-container">
@@ -54,6 +53,15 @@
             <span class="card-label">% Ritmo (vs. meta do período)</span>
             <span class="card-value" id="cardRitmo">—</span>
           </div>
+        </section>
+
+        <section class="panel panel--ia-compact">
+          <div class="ia-header">
+            <h2>Análise dos Principais Indicadores</h2>
+            <span class="ia-badge">Gerado por IA</span>
+          </div>
+          <p class="ia-texto" id="iaTexto">Carregando análise...</p>
+          <p class="ia-timestamp" id="iaTimestamp"></p>
         </section>
 
         <section class="panel panel--grow">
@@ -220,15 +228,6 @@
             </div>
           </section>
         </div>
-      </section>
-
-      <section class="page" data-page="analise-ia">
-        <section class="panel panel--centered panel--ia">
-          <div class="ia-badge">Gerado por IA</div>
-          <h2>Análise dos Principais Indicadores</h2>
-          <p class="ia-texto" id="iaTexto">Carregando análise...</p>
-          <p class="ia-timestamp" id="iaTimestamp"></p>
-        </section>
       </section>
 
     </main>
