@@ -229,6 +229,7 @@ function agruparChavesSimilares(obj, canonico) {
 
 function renderizarCards(resumo, pipeline) {
   document.getElementById('cardFaturado').textContent = fmtMoeda(resumo.totalFaturado);
+  document.getElementById('cardReembolsos').textContent = fmtMoeda(resumo.totalReembolsos);
   document.getElementById('cardMeta').textContent = fmtMoeda(resumo.metaConservadora);
   document.getElementById('cardAtingimento').textContent = fmtPercent(resumo.percentualAtingimento);
   document.getElementById('cardPipeline').textContent = pipeline.totalPropostas + ' propostas';
