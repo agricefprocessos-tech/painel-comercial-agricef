@@ -14,12 +14,16 @@ const fmtMoeda = (valor) =>
 const fmtPercent = (valor) =>
   valor === null || valor === undefined ? '—' : new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFractionDigits: 1 }).format(valor);
 
+let dadosGlobais = null;
+let filtroNivel1Ativo = null;
+
 async function carregarDados() {
   document.getElementById('ultimaAtualizacao').textContent = 'Atualizando...';
   try {
     const resp = await fetch(`${API_URL}?recurso=tudo`);
     const dados = await resp.json();
     if (dados.erro) throw new Error(dados.erro);
+    dadosGlobais = dados;
     renderizarTudo(dados);
     document.getElementById('ultimaAtualizacao').textContent =
       'Atualizado em ' + new Date(dados.atualizadoEm).toLocaleString('pt-BR');
@@ -29,22 +33,97 @@ async function carregarDados() {
   }
 }
 
+// Deriva as visões dependentes (cards, mensal, nível 3, previsão eqpto) filtradas
+// para a linha de negócio ativa. Os "indicadores-fonte" (doughnut Nível 1, tabela
+// Meta por Linha, doughnut/cards de Oportunidades por Linha) continuam mostrando
+// todas as linhas, só com destaque, para permitirem alternar/trocar o filtro.
+function filtrarPorNivel1(dados, filtro) {
+  if (!filtro) {
+    return {
+      resumo: dados.resumo,
+      faturamentoMes: dados.faturamentoMes,
+      faturamentoPorNivel3: dados.faturamentoPorNivel3,
+      previsaoEqpto: dados.previsaoEqpto,
+    };
+  }
+
+  const ating = (dados.resumo.atingimentoPorNivel1 || {})[filtro] || {};
+  const resumo = {
+    ...dados.resumo,
+    totalFaturado: dados.resumo.faturadoPorNivel1?.[filtro] || 0,
+    metaConservadora: dados.resumo.metaPorNivel1?.[filtro] || 0,
+    percentualAtingimento: ating.percentual ?? null,
+    metaAcumulada: ating.metaAcumulada ?? 0,
+    percentualAtingimentoPacing: ating.percentualPacing ?? null,
+    metaRestante: ating.metaRestante ?? 0,
+  };
+
+  const faturamentoMes = (dados.faturamentoMensalPorNivel1 || []).map(m => ({
+    anoMes: m.anoMes,
+    valor: (m.porNivel1 || {})[filtro] || 0,
+  }));
+
+  const faturamentoPorNivel3 = dados.faturamentoPorNivel3?.[filtro]
+    ? { [filtro]: dados.faturamentoPorNivel3[filtro] }
+    : {};
+
+  const previsaoEqpto = filtro === 'Equipamentos'
+    ? dados.previsaoEqpto
+    : { totalGeral: 0, totalPorStatus: {}, porMes: [], lista: [] };
+
+  return { resumo, faturamentoMes, faturamentoPorNivel3, previsaoEqpto };
+}
+
+// Cor cheia se não há filtro ou se esta é a linha selecionada; esmaecida caso contrário.
+function corComDestaque(corBase, linha) {
+  if (!filtroNivel1Ativo || linha === filtroNivel1Ativo) return corBase;
+  return corBase + '33';
+}
+
+function alternarFiltroNivel1(linha) {
+  filtroNivel1Ativo = (filtroNivel1Ativo === linha) ? null : linha;
+  if (dadosGlobais) renderizarTudo(dadosGlobais);
+}
+
+function atualizarBarraFiltro() {
+  const container = document.getElementById('filtroLinhaNegocio');
+  if (!container || !dadosGlobais) return;
+  const linhas = Object.keys(dadosGlobais.resumo.faturadoPorNivel1 || {});
+  container.innerHTML = '';
+
+  const btnTodos = document.createElement('button');
+  btnTodos.className = 'filtro-pill' + (filtroNivel1Ativo ? '' : ' filtro-pill--ativo');
+  btnTodos.textContent = 'Todas as linhas';
+  btnTodos.addEventListener('click', () => { filtroNivel1Ativo = null; renderizarTudo(dadosGlobais); });
+  container.appendChild(btnTodos);
+
+  linhas.forEach(linha => {
+    const btn = document.createElement('button');
+    btn.className = 'filtro-pill' + (linha === filtroNivel1Ativo ? ' filtro-pill--ativo' : '');
+    btn.textContent = linha;
+    btn.addEventListener('click', () => alternarFiltroNivel1(linha));
+    container.appendChild(btn);
+  });
+}
+
 function renderizarTudo(dados) {
-  renderizarCards(dados.resumo, dados.pipeline);
+  const filtrados = filtrarPorNivel1(dados, filtroNivel1Ativo);
+  renderizarCards(filtrados.resumo, dados.pipeline);
   renderizarCarteira(dados.carteira);
   renderizarCarteiraDetalhe(dados.carteira);
   renderizarMetaPorLinha(dados.resumo.atingimentoPorNivel1);
-  renderizarFaturamentoMensal(dados.faturamentoMes);
+  renderizarFaturamentoMensal(filtrados.faturamentoMes);
   renderizarFaturamentoMensalPorLinha(dados.faturamentoMensalPorNivel1);
   renderizarNivel1(dados.resumo.faturadoPorNivel1);
-  renderizarNivel3(dados.faturamentoPorNivel3);
+  renderizarNivel3(filtrados.faturamentoPorNivel3);
   renderizarOportunidades(dados.oportunidades);
   renderizarOportunidadesPorLinha(dados.oportunidades.totalPorNivel1);
   renderizarOportunidadesLinhaCards(dados.oportunidades.totalPorNivel1);
   renderizarCenarios(dados.cenarios, dados.carteira);
   renderizarPipeline(dados.pipeline);
-  renderizarPrevisaoEqpto(dados.previsaoEqpto);
+  renderizarPrevisaoEqpto(filtrados.previsaoEqpto);
   renderizarAnaliseIA(dados.analiseIA);
+  atualizarBarraFiltro();
   redimensionarGraficos();
 }
 
@@ -190,6 +269,9 @@ function renderizarMetaPorLinha(atingimentoPorNivel1) {
     const pct = dado.percentual === null ? 0 : Math.min(dado.percentual * 100, 100);
     const pctPacing = dado.percentualPacing === null || dado.percentualPacing === undefined ? 0 : Math.min(dado.percentualPacing * 100, 100);
     const tr = document.createElement('tr');
+    tr.className = 'linha-clicavel' +
+      (linha === filtroNivel1Ativo ? ' linha-ativa' : '') +
+      (filtroNivel1Ativo && linha !== filtroNivel1Ativo ? ' linha-dimmed' : '');
     tr.innerHTML = `
       <td>${linha}</td>
       <td>${fmtMoeda(dado.faturado)}</td>
@@ -204,6 +286,7 @@ function renderizarMetaPorLinha(atingimentoPorNivel1) {
         <span>${fmtPercent(dado.percentualPacing)}</span>
       </td>
     `;
+    tr.addEventListener('click', () => alternarFiltroNivel1(linha));
     corpoTabela.appendChild(tr);
   });
 }
@@ -279,7 +362,7 @@ function renderizarFaturamentoMensalPorLinha(serie) {
       datasets: linhas.map(linha => ({
         label: linha,
         data: dadosSerie.map(s => s.porNivel1[linha] || 0),
-        backgroundColor: cores[linha] || PALETA.midGreen,
+        backgroundColor: corComDestaque(cores[linha] || PALETA.midGreen, linha),
       })),
     },
     options: {
@@ -288,6 +371,10 @@ function renderizarFaturamentoMensalPorLinha(serie) {
       scales: {
         x: { stacked: true },
         y: { stacked: true, ticks: { callback: v => fmtMoeda(v) } },
+      },
+      onClick: (evt, elems) => { if (elems.length) alternarFiltroNivel1(linhas[elems[0].datasetIndex]); },
+      plugins: {
+        legend: { onClick: (evt, legendItem) => alternarFiltroNivel1(legendItem.text) },
       },
     },
   });
@@ -324,8 +411,11 @@ function renderizarOportunidadesLinhaCards(porNivel1) {
   container.innerHTML = '';
   Object.entries(porNivel1 || {}).forEach(([linha, valor]) => {
     const div = document.createElement('div');
-    div.className = 'mini-card';
+    div.className = 'mini-card mini-card--clicavel' +
+      (linha === filtroNivel1Ativo ? ' mini-card--ativo' : '') +
+      (filtroNivel1Ativo && linha !== filtroNivel1Ativo ? ' mini-card--dimmed' : '');
     div.innerHTML = `<span class="mini-label">Oportunidades - ${linha}</span><span class="mini-value">${fmtMoeda(valor)}</span>`;
+    div.addEventListener('click', () => alternarFiltroNivel1(linha));
     container.appendChild(div);
   });
 }
@@ -334,16 +424,21 @@ function renderizarNivel1(porNivel1) {
   destruirSeExistir('nivel1');
   const ctx = document.getElementById('chartNivel1');
   const labels = Object.keys(porNivel1);
+  const coresBase = [PALETA.darkGreen, PALETA.gold, PALETA.sage, PALETA.midGreen];
   charts.nivel1 = new Chart(ctx, {
     type: 'doughnut',
     data: {
       labels,
       datasets: [{
         data: Object.values(porNivel1),
-        backgroundColor: [PALETA.darkGreen, PALETA.gold, PALETA.sage, PALETA.midGreen],
+        backgroundColor: labels.map((l, i) => corComDestaque(coresBase[i % coresBase.length], l)),
       }],
     },
-    options: { responsive: true, maintainAspectRatio: false },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onClick: (evt, elems) => { if (elems.length) alternarFiltroNivel1(labels[elems[0].index]); },
+    },
   });
 }
 
@@ -395,16 +490,21 @@ function renderizarOportunidadesPorLinha(porNivel1) {
   destruirSeExistir('oportLinha');
   const ctx = document.getElementById('chartOportunidadesLinha');
   const labels = Object.keys(porNivel1 || {});
+  const coresBase = [PALETA.darkGreen, PALETA.gold, PALETA.sage, PALETA.midGreen];
   charts.oportLinha = new Chart(ctx, {
     type: 'doughnut',
     data: {
       labels,
       datasets: [{
         data: Object.values(porNivel1 || {}),
-        backgroundColor: [PALETA.darkGreen, PALETA.gold, PALETA.sage, PALETA.midGreen],
+        backgroundColor: labels.map((l, i) => corComDestaque(coresBase[i % coresBase.length], l)),
       }],
     },
-    options: { responsive: true, maintainAspectRatio: false },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onClick: (evt, elems) => { if (elems.length) alternarFiltroNivel1(labels[elems[0].index]); },
+    },
   });
 }
 
